@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "PASV — Possibility-Adjusted Shot Value: A Per-Shot Theory of Possibility Cost in NBA Possession Value"
+abstract: >-
+  PASV (Possibility-Adjusted Shot Value) is a per-shot signed scalar that grades each
+  NBA shot decision against the continuation value of the alternatives the shot
+  forecloses: PASV = xPTS(shot) − V*(s*). It unifies Skinner's (2012) MDP-cutoff and
+  Cervone et al.'s (2014) Expected Possession Value into a single, interpretable,
+  per-shot decision grade, accompanied by the closed-form Holding-Math Theorem and the
+  Option Preservation Coefficient (OPC). Companion code, data, and pre-registration for
+  the MIT Sloan Sports Analytics Conference 2027 submission.
+type: software
+authors:
+  - family-names: Morong
+    given-names: Bobby
+    affiliation: DataDunkNBA
+    email: bobby@datadunknba.com
+repository-code: "https://github.com/GrobeStreet/pasv"
+url: "https://datadunknba.substack.com"
+license: MIT
+version: "0.2-dev"
+date-released: 2026-06-29
+keywords:
+  - basketball analytics
+  - NBA
+  - shot selection
+  - possession value
+  - Markov decision process
+  - sports analytics
+preferred-citation:
+  type: conference-paper
+  title: "Every Shot Is a Measurement: A Per-Shot Theory of Possibility Cost in the NBA"
+  authors:
+    - family-names: Morong
+      given-names: Bobby
+  collection-title: "MIT Sloan Sports Analytics Conference 2027 (submitted)"
+  year: 2027

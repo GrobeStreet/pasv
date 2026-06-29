@@ -5,9 +5,11 @@
 ## What this notebook validates
 
 1. The PASV v0.1 team-aggregate computation pipeline (Section 5.1)
-2. The cross-sectional correlation with WEV v3 composite (Section 5.1.4 — r ≈ 0.61)
-3. The weight sensitivity analysis (Section 5.1.5 — r ∈ [0.55, 0.64] under ±0.05 perturbation)
+2. The cross-sectional correlation with WEV v3 composite (Section 5.1.4 — **r ≈ 0.81 on the bundled data**)
+3. The weight sensitivity analysis (Section 5.1.5 — **r ∈ [0.73, 0.86] under ±0.05 perturbation** on the bundled data)
 4. The OPC AST% proxy distribution by position (Section 5.3)
+
+> **Note on the correlation figure (read this).** This notebook reproduces results against the **bundled** `data/pasv_v01_2025_team_aggregate.csv`, which yields **r ≈ 0.81**. The original 2026-05-26 pre-registration reported **r ≈ 0.61** computed on the source data pipeline (different season-aggregate snapshot and intermediate rounding). The two numbers refer to different input snapshots, not different methods; see `CHANGELOG.md`. The bundled, reproducible number is **0.81** — that is what this notebook prints. Any older "≈0.61" expectation in prior drafts is superseded for the bundled dataset.
 
 ## Steps
 
@@ -37,7 +39,7 @@ print(pasv_df[["rank", "team", "PASV_v0_1"]].to_string(index=False))
 # -----------------------------------------------------------------------------
 correlation = pasv_df[["PASV_v0_1", "WEV_v3"]].corr().iloc[0, 1]
 print(f"\nPASV v0.1 × WEV v3 correlation across 30 teams: r = {correlation:.4f}")
-# Expected: r ≈ 0.61
+# Expected on bundled data: r ≈ 0.81  (the 0.61 in earlier drafts was the source-pipeline snapshot; see CHANGELOG.md)
 
 # -----------------------------------------------------------------------------
 # Step 4 — Visualize: PASV v0.1 ranking with WEV v3 overlay
