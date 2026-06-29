@@ -1,0 +1,72 @@
+PASV Study 1 — INDEPENDENT CONFIRMATION (different estimators)
+======================================================================
+Data dir: /sessions/vibrant-confident-faraday/mnt/Basketball Stats Book/dti_data
+Calibrate: 2024-25 RS | Test: 2024-25 Playoffs (held out)
+Players >=30 playoff FGA: 119 | shots pooled: 13,463
+
+[DIAG] Does V* vary WITHIN a player's own shots?
+  mean within-player SD of V*    = 0.03393
+  fraction of shots w/ ~0 within-V* variance = 0.000
+  corr(PASV, xPTS) raw           = 0.9701
+  corr(PASV_within, xPTS_within) = 0.9797
+
+[METHOD 1] Within-player partial R^2 via FWL (residualize on player FE)
+----------------------------------------------------------------------
+Predictor        within-r  partial-R2    t-stat        n
+PASV               0.1471      0.0216    17.183    13463
+Skinner_gap        0.1119      0.0125    13.008    13463
+raw xPTS           0.1519      0.0231    17.757    13463
+----------------------------------------------------------------------
+  partial-R2  PASV - Skinner = +0.0091
+  partial-R2  PASV - rawxPTS = -0.0014
+
+[METHOD 1b] statsmodels OLS y ~ predictor + C(player), single-predictor
+----------------------------------------------------------------------
+Predictor            coef        t          p   R2(full)
+(player FE only)                                    0.0092
+PASV               0.9842   17.183  1.814e-65     0.0307
+Skinner_gap        0.6734   13.008  1.893e-38     0.0216
+raw xPTS           1.0380   17.757  9.663e-70     0.0321
+
+[METHOD 2] NESTED TEST: does adding PASV to {xPTS + player FE} help?
+  Base : fg_pts ~ xPTS + C(player)
+  Full : fg_pts ~ xPTS + PASV + C(player)   (PASV = xPTS - V*)
+----------------------------------------------------------------------
+  Base  R2=0.03211  AIC=42868.36
+  Full  R2=0.03218  AIC=42869.34
+  ΔR2 (full-base)       = +0.000074
+  ΔAIC (full-base)      = +0.974  (PASV does NOT help)
+  F-test F              = 1.0169
+  F-test p-value        = 0.3133   <-- KEY NUMBER
+  PASV coef in full     = -0.28821
+  PASV t in full        = -1.008
+
+  [reverse] add xPTS to {PASV + FE}:
+    ΔR2=+0.001498  F=20.648  p=0.0000  (xPTS adds signal over PASV?)
+
+  [Skinner] add Skinner_gap to {xPTS+FE}: ΔR2=+0.001730  p=0.0000
+
+[METHOD 3] Within-player median-split lift (robustness to min_shots)
+----------------------------------------------------------------------
+  min_shots = 30:
+    Predictor        lift(PPP)  %players up   n_pl
+    PASV               +0.2325        79.0%    119
+    Skinner_gap        +0.2372        74.1%    108
+    raw xPTS           +0.3180        81.9%    105
+    ordering (high->low lift): raw xPTS(+0.318) > Skinner_gap(+0.237) > PASV(+0.233)
+
+  min_shots = 50:
+    Predictor        lift(PPP)  %players up   n_pl
+    PASV               +0.2337        81.1%     90
+    Skinner_gap        +0.2356        75.6%     86
+    raw xPTS           +0.3029        82.1%     84
+    ordering (high->low lift): raw xPTS(+0.303) > Skinner_gap(+0.236) > PASV(+0.234)
+
+======================================================================
+VERDICT
+----------------------------------------------------------------------
+  Method1 partial-R2: PASV-xPTS = -0.0014, PASV-Skinner = +0.0091
+  Method2 nested F p (PASV | xPTS) = 0.3133, ΔAIC = +0.97
+  -> PASV approximately EQUALS raw xPTS within player; PASV BEATS Skinner.
+  -> Conditional on xPTS, V* term is NOT significant (p=0.3133).
+     => original 'within-player equivalent to xPTS' conclusion HOLDS.

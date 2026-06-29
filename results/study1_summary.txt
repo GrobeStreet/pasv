@@ -1,0 +1,15 @@
+PASV Study 1 — per-shot PASV vs Skinner 2012 (held-out OOS)
+================================================================
+Calibration: 2024-25 Regular Season (219,527 FG attempts)
+Held-out test: 2024-25 Playoffs (14,377 FG attempts)
+Player aggregation, min 50 playoff FGA: n = 90 players
+
+Ground truth: player realized points-per-FGA in held-out playoffs
+----------------------------------------------------------------
+  R^2(Skinner gap,  truth) = 0.1093   [baseline]
+  R^2(PASV per-shot, truth) = 0.0555   [contribution]
+  R^2(raw xPTS,      truth) = 0.1073   [reference]
+----------------------------------------------------------------
+  Delta R^2 (PASV - Skinner) = -0.0537
+  Validation-plan target: Delta R^2 > 0.04 in PASV's favor
+  Target met: NO

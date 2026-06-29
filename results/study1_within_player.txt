@@ -1,0 +1,21 @@
+PASV Study 1 — WITHIN-PLAYER decision test (held-out OOS)
+================================================================
+Calibrate: 2024-25 RS  |  Test: 2024-25 Playoffs (held out)
+Players with >=30 playoff FG attempts: 119
+Within-player shots pooled: 13,463
+
+Player fixed effects: predictor & outcome demeaned per player.
+Tests whether a player's OWN higher-scored shots score more.
+----------------------------------------------------------------
+Predictor       within-r  within-R2  medsplit lift  %players up
+PASV              0.1471     0.0216        +0.2325        79.0%
+Skinner_gap       0.1119     0.0125        +0.2372        74.1%
+raw xPTS          0.1519     0.0231        +0.3180        81.9%
+----------------------------------------------------------------
+  within-R2  PASV - Skinner = +0.0091
+  within-R2  PASV - rawxPTS = -0.0014
+
+VERDICT:
+  PASV is within-player EQUIVALENT to raw xPTS (no add, no loss).
+  -> Reframe: PASV is a decision-diagnosis lens, not a predictive
+     improvement over shot quality. Honest, novel, less marketable.

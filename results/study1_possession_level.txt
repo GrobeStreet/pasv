@@ -1,0 +1,75 @@
+PASV Study 1 — POSSESSION/SHOT-LEVEL validation (held-out OOS)
+====================================================================
+Calibrate: 2024-25 RS (219,527 FG attempts)
+Test OOS : 2024-25 Playoffs LINEUPS (14,377 FG attempts with full scores)
+
+Realized PPP (all shots): 1.0556
+FG made rate            : 0.4551
+corr(PASV, Skinner_gap) : 0.8529
+corr(PASV, xPTS)        : 0.9686
+corr(Skinner, xPTS)     : 0.8783
+
+--------------------------------------------------------------------
+1. SHOT-LEVEL correlation with realized FG points (made_2=2, made_3=3, miss=0)
+--------------------------------------------------------------------
+predictor        Pearson r          R2         n
+PASV                0.1479      0.0219    14,377
+Skinner_gap         0.1186      0.0141    14,377
+xPTS                0.1559      0.0243    14,377
+
+1b. SHOT-LEVEL point-biserial correlation with made/miss binary
+predictor        Pearson r          R2
+PASV                0.1762      0.0310
+Skinner_gap         0.1395      0.0195
+xPTS                0.1836      0.0337
+
+--------------------------------------------------------------------
+2. Out-of-sample 5-fold CV OLS R2 (single predictor -> realized FG points)
+--------------------------------------------------------------------
+  PASV           CV R2 = +0.0211
+  Skinner_gap    CV R2 = +0.0133
+  xPTS           CV R2 = +0.0236
+
+--------------------------------------------------------------------
+3. Out-of-sample 5-fold CV logistic (single predictor -> made/miss)
+--------------------------------------------------------------------
+  baseline (intercept-only) log-loss = 0.6891
+predictor        CV log-loss      CV AUC
+PASV                  0.6738      0.5831
+Skinner_gap           0.6796      0.5733
+xPTS                  0.6724      0.5855
+
+--------------------------------------------------------------------
+4. DECISION-QUALITY framing: realized PPP by metric sign / decision
+--------------------------------------------------------------------
+PASV sign:
+  PASV>0  (good decision): n= 5,362  realized PPP=1.2301  made%=0.5520
+  PASV<=0 (bad decision) : n= 9,015  realized PPP=0.9517  made%=0.3974
+  PPP separation (good - bad) = +0.2784
+
+Skinner decision (shoot iff xPTS >= f*(tau)):
+  SHOOT: n=14,377  realized PPP=1.0556  made%=0.4551
+  HOLD : n=     0  realized PPP=nan  made%=nan
+  PPP separation (shoot - hold) = +nan
+  NOTE: every attempt clears f*(tau) -> Skinner's binary rule never says HOLD
+  on real NBA xPTS (cutoffs are in Skinner's normalized units ~0.9-1.0).
+  Below we split Skinner by gap sign relative to its own MEDIAN gap so it
+  gets a comparable two-bucket decision split.
+
+Skinner gap relative to its own median (fair 2-bucket split):
+  high gap: n= 8,017  realized PPP=1.1832  made%=0.4912
+  low  gap: n= 6,360  realized PPP=0.8947  made%=0.4096
+  PPP separation (high - low) = +0.2886
+  (matched PASV median split PPP separation = +0.2956)
+
+Reference - raw xPTS above/below median (1.099):
+  high xPTS: n= 7,741  realized PPP=1.2026
+  low  xPTS: n= 6,636  realized PPP=0.8841
+  PPP separation = +0.3184
+
+====================================================================
+Summary deltas (shot-level R2 vs realized points):
+  R2(PASV)=0.0219  R2(Skinner)=0.0141  R2(xPTS)=0.0243
+  PASV - Skinner = +0.0078
+  PASV - xPTS    = -0.0024
+  Decision separation: PASV=+0.2784 vs Skinner=+nan
