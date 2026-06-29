@@ -1,4 +1,12 @@
-code/__pycache__/
-results/*
+__pycache__/
 !results/.gitkeep
+.DS_Store
+.ipynb_checkpoints/
 *.pyc
+*.pyo
+<<<<<<< HEAD
+=======
+>>>>>>> 50d7b996a6a81d6c6a881a91333cba2329ba8a81
+code/__pycache__/
+results/
+results/*
