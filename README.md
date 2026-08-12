@@ -34,7 +34,7 @@ Empirically validated on 2025 NBA regular-season data. Pre-registered against th
 ├── requirements.txt                             # Python dependencies
 ├── paper/
 │   ├── SSAC27_PASV_PAPER_FULL_v1.md             # The complete paper
-│   └── SSAC27_PASV_Abstract_v1.md               # The 490-word abstract
+│   └── SSAC27_PASV_Abstract_v3_2026-06-29.md   # Submitted 500-word abstract (per-shot headline)
 ├── code/
 │   ├── pasv_v01.py                              # PASV v0.1 team-aggregate computation
 │   ├── opc_proxy.py                             # OPC AST% proxy computation
