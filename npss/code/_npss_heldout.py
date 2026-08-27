@@ -1,65 +1,116 @@
 """
 NPSS held-out temporal validation.
-Train window: 2017-2022 (define/fit on these). Test window: 2023-2025 (UNSEEN).
-Tests whether the schemable-big + hunt collapse-detection survives out-of-sample.
+Train window: 2017-2022. Test window: 2023-2025 (unseen).
 
-The flags are RULE-BASED (binary, from raw stats), so "fitting" = (a) confirming the
-schemable-big separation exists on TRAIN, then (b) measuring collapse detection on TEST
-with the flags computed identically. Penalties aren't needed for the collapse-screen
-claim (that's a classification result, not the point-prediction). We report the screen
-metrics on train vs held-out test.
+IMPORTANT CORRECTION (2026-08-26): the original held-out script used Python
+truthiness for the continuous `hunt` score (`r.get("hunt") or ...`). That
+incorrectly treated every non-zero hunt score as Hunt-Exposed and produced an
+inflated 100% held-out recall claim. The canonical v0.2 rule is
+`hunt >= 0.30`. This script now implements that threshold explicitly.
+
+The flags are rule-based from regular-season data. Penalty magnitudes are not
+used for the collapse-screen evaluation below.
 """
-import json, statistics as st
+import json
+import statistics as st
 
 P = json.load(open("data/npss_panel.json"))
-ANCHOR = 1.75          # collapse = playoff AQI falls below this
-STAR = 2.0             # regular-season star threshold
+ANCHOR = 1.75
+STAR = 2.0
+HUNT_THRESHOLD = 0.30
+
 
 def split(rows, lo, hi):
     return [r for r in rows if lo <= r["year"] <= hi]
 
+
+def hunt_exposed(r):
+    try:
+        return float(r.get("hunt") or 0.0) >= HUNT_THRESHOLD
+    except (TypeError, ValueError):
+        return False
+
+
+def schemable_big(r):
+    return r.get("schemable") == 1
+
+
+def flagged_v02(r):
+    return hunt_exposed(r) or schemable_big(r)
+
+
 def schemable_sep(rows):
-    """mean RS->PO AQI drop for schemable vs non-schemable bigs (the core discovery)."""
-    # identify 'bigs' the same way the framework does: archetype big OR has the flag's inputs
-    sch = [r for r in rows if r.get("schemable") == 1]
-    # non-schemable bigs: archetype contains 'big' but not flagged
-    nonsch = [r for r in rows if r.get("schemable") == 0 and "big" in str(r.get("arch","")).lower()]
+    """Mean RS->PO AQI change for schemable vs non-schemable bigs."""
+    sch = [r for r in rows if schemable_big(r)]
+    nonsch = [
+        r for r in rows
+        if r.get("schemable") == 0 and "big" in str(r.get("arch", "")).lower()
+    ]
+
     def drop(rs):
-        ds = [r["po_aqi"] - r["aqi"] for r in rs if r.get("po_aqi") is not None and r.get("aqi") is not None]
+        ds = [
+            r["po_aqi"] - r["aqi"]
+            for r in rs
+            if r.get("po_aqi") is not None and r.get("aqi") is not None
+        ]
         return (st.mean(ds), len(ds)) if ds else (float("nan"), 0)
+
     return drop(sch), drop(nonsch)
 
+
 def collapse_screen(rows):
-    """Among RS stars (AQI>=2.0): collapse = po_aqi < 1.75. Compare flagged vs not."""
-    stars = [r for r in rows if r.get("aqi", 0) >= STAR and r.get("po_aqi") is not None]
-    flagged = [r for r in stars if r.get("hunt") or r.get("schemable")]
-    notf = [r for r in stars if not (r.get("hunt") or r.get("schemable"))]
+    """Among RS stars, collapse = playoff AQI < 1.75. Evaluate canonical v0.2 flags."""
+    stars = [
+        r for r in rows
+        if r.get("aqi", 0) >= STAR and r.get("po_aqi") is not None
+    ]
+    flagged = [r for r in stars if flagged_v02(r)]
+    notf = [r for r in stars if not flagged_v02(r)]
+
     def rate(rs):
-        if not rs: return (float("nan"), 0, float("nan"))
+        if not rs:
+            return (float("nan"), 0, float("nan"))
         col = [r for r in rs if r["po_aqi"] < ANCHOR]
         drops = [r["po_aqi"] - r["aqi"] for r in rs]
-        return (len(col)/len(rs), len(rs), st.mean(drops))
-    fr = rate(flagged); nr = rate(notf)
-    # recall: of all actual star collapses, how many were flagged
+        return (len(col) / len(rs), len(rs), st.mean(drops))
+
+    fr = rate(flagged)
+    nr = rate(notf)
     all_collapses = [r for r in stars if r["po_aqi"] < ANCHOR]
-    caught = [r for r in all_collapses if r.get("hunt") or r.get("schemable")]
-    recall = len(caught)/len(all_collapses) if all_collapses else float("nan")
-    lift = (fr[0]/nr[0]) if (nr[0] and nr[0]==nr[0] and nr[0]>0) else float("nan")
-    return fr, nr, recall, lift, len(stars)
+    caught = [r for r in all_collapses if flagged_v02(r)]
+    recall = len(caught) / len(all_collapses) if all_collapses else float("nan")
+    lift = fr[0] / nr[0] if nr[0] == nr[0] and nr[0] > 0 else float("nan")
+
+    tp = len(caught)
+    fn = len(all_collapses) - tp
+    fp = len([r for r in flagged if r["po_aqi"] >= ANCHOR])
+    tn = len([r for r in notf if r["po_aqi"] >= ANCHOR])
+    precision = tp / (tp + fp) if tp + fp else float("nan")
+    specificity = tn / (tn + fp) if tn + fp else float("nan")
+
+    return fr, nr, recall, lift, len(stars), tp, fp, fn, tn, precision, specificity
+
 
 def report(label, rows):
-    print(f"\n===== {label}  (n={len(rows)} player-seasons) =====")
+    print(f"\n===== {label} (n={len(rows)} player-seasons) =====")
     (sd, sn), (nd, nn) = schemable_sep(rows)
-    print(f"  schemable-big RS->PO AQI drop: {sd:+.3f} (n={sn})   non-schemable big: {nd:+.3f} (n={nn})")
-    fr, nr, recall, lift, ns = collapse_screen(rows)
-    print(f"  RS stars (AQI>=2.0): n={ns}")
-    print(f"  flagged collapse rate: {fr[0]:.1%} (n={fr[1]}, mean drop {fr[2]:+.3f})")
-    print(f"  not-flagged collapse rate: {nr[0]:.1%} (n={nr[1]}, mean drop {nr[2]:+.3f})")
-    print(f"  base-rate LIFT (flagged/not): {lift:.2f}x")
-    print(f"  RECALL (collapses caught): {recall:.1%}")
+    print(
+        f"  schemable-big RS->PO AQI change: {sd:+.3f} (n={sn})   "
+        f"non-schemable big: {nd:+.3f} (n={nn})"
+    )
+    fr, nr, recall, lift, ns, tp, fp, fn, tn, precision, specificity = collapse_screen(rows)
+    print(f"  RS stars (AQI>={STAR:.1f}): n={ns}")
+    print(f"  flagged collapse rate: {fr[0]:.1%} (n={fr[1]}, mean change {fr[2]:+.3f})")
+    print(f"  not-flagged collapse rate: {nr[0]:.1%} (n={nr[1]}, mean change {nr[2]:+.3f})")
+    print(f"  base-rate lift (flagged/not): {lift:.2f}x")
+    print(f"  recall: {recall:.1%}")
+    print(f"  precision: {precision:.1%}")
+    print(f"  specificity: {specificity:.1%}")
+    print(f"  confusion matrix: TP={tp} FP={fp} FN={fn} TN={tn}")
 
-print("NPSS HELD-OUT TEMPORAL VALIDATION")
-print("="*60)
-report("TRAIN 2017-2022 (in-sample)", split(P,2017,2022))
-report("TEST 2023-2025 (HELD OUT, unseen)", split(P,2023,2025))
-report("FULL 2017-2025 (reference, matches the doc)", split(P,2017,2025))
+
+print("NPSS HELD-OUT TEMPORAL VALIDATION — CORRECTED v0.2 RULE")
+print("=" * 72)
+report("TRAIN 2017-2022", split(P, 2017, 2022))
+report("TEST 2023-2025 (HELD OUT)", split(P, 2023, 2025))
+report("FULL 2017-2025 (REFERENCE)", split(P, 2017, 2025))
