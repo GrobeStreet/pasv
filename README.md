@@ -5,7 +5,7 @@
 Companion code, data, and pre-registration artifacts for the MIT Sloan Sports Analytics Conference 2027 research paper submission.
 
 **Author:** Bobby Morong ([DataDunkNBA](https://datadunknba.substack.com))
-**Contact:** bobby@datadunknba.com
+**Contact:** bobby@trainingties.com
 **Paper:** [`paper/SSAC27_PASV_PAPER_FULL_v1.md`](paper/SSAC27_PASV_PAPER_FULL_v1.md)
 **License:** MIT
 
