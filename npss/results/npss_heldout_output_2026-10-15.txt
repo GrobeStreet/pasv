@@ -1,0 +1,35 @@
+NPSS HELD-OUT TEMPORAL VALIDATION — CORRECTED v0.2 RULE
+========================================================================
+
+===== TRAIN 2017-2022 (n=751 player-seasons) =====
+  schemable-big RS->PO AQI change: -0.197 (n=111)   non-schemable big: +0.022 (n=47)
+  RS stars (AQI>=2.0): n=50
+  flagged collapse rate: 38.1% (n=21, mean change -0.506)
+  not-flagged collapse rate: 17.2% (n=29, mean change -0.074)
+  base-rate lift (flagged/not): 2.21x
+  recall: 61.5%
+  precision: 38.1%
+  specificity: 64.9%
+  confusion matrix: TP=8 FP=13 FN=5 TN=24
+
+===== TEST 2023-2025 (HELD OUT) (n=380 player-seasons) =====
+  schemable-big RS->PO AQI change: -0.190 (n=51)   non-schemable big: -0.108 (n=24)
+  RS stars (AQI>=2.0): n=21
+  flagged collapse rate: 36.4% (n=11, mean change -0.883)
+  not-flagged collapse rate: 20.0% (n=10, mean change -0.709)
+  base-rate lift (flagged/not): 1.82x
+  recall: 66.7%
+  precision: 36.4%
+  specificity: 53.3%
+  confusion matrix: TP=4 FP=7 FN=2 TN=8
+
+===== FULL 2017-2025 (REFERENCE) (n=1131 player-seasons) =====
+  schemable-big RS->PO AQI change: -0.194 (n=162)   non-schemable big: -0.022 (n=71)
+  RS stars (AQI>=2.0): n=71
+  flagged collapse rate: 37.5% (n=32, mean change -0.636)
+  not-flagged collapse rate: 17.9% (n=39, mean change -0.237)
+  base-rate lift (flagged/not): 2.09x
+  recall: 63.2%
+  precision: 37.5%
+  specificity: 61.5%
+  confusion matrix: TP=12 FP=20 FN=7 TN=32

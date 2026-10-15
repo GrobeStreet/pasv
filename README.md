@@ -24,7 +24,7 @@ where `xPTS(shot)` is expected points from the shot taken and `V*(s*)` is the es
 
 The research question is not merely whether a shot was good. It is whether the shot was good **relative to the alternatives it ended**.
 
-PASV is explicitly downstream of prior work on shot selection and possession value, especially Skinner (2012) and Cervone et al. (2014).
+PASV is explicitly downstream of prior work on shot selection and possession value. See **Related work** below.
 
 ---
 
@@ -93,17 +93,30 @@ The historical full manuscript remains in the repository for auditability, but i
 
 ---
 
+## Related work
+
+PASV builds on, and must be read against, four prior lines of work:
+
+- **Skinner, B. (2012).** The problem of shot selection in basketball. *PLOS ONE* 7(1): e30776. https://doi.org/10.1371/journal.pone.0030776. The optimal-stopping frame PASV uses.
+- **Cervone, D., D'Amour, A., Bornn, L., & Goldsberry, K. (2016).** A multiresolution stochastic process model for predicting basketball possession outcomes. *Journal of the American Statistical Association* 111(514). arXiv:1408.0777. Expected possession value as a continuously updated quantity.
+- **Sandholtz, N., & Bornn, L. (2020).** Markov decision processes with dynamic transition probabilities: an analysis of shooting strategies in basketball. *Annals of Applied Statistics* 14(3): 1122–1145. https://doi.org/10.1214/20-AOAS1348. Region-level expected points inside an MDP of shot policy; names defender-conditioned action values as future work.
+- **Duma, N., & Benaharon, L. (2026).** Efficient frontier optimization of NBA shot selection using Markov reward processes. arXiv:2607.02933. A static shot-diet frontier finding the league near-efficient, with gains from more rim attempts; names missing personnel identification as a limitation.
+
+The shot-value ladder in this repository (dunk 1.81, rim 1.26, corner three 1.17, above-the-break three 1.07, mid-range and paint non-rim 0.86) reproduces public values and is pipeline validation, not a contribution. The direction "more rim, less mid-range" is Duma & Benaharon's published result. PASV's open question is the state-contingent one: whether conditioning on defender identity changes the value of continuing a possession.
+
 ## Pre-registration record
 
 The May 26, 2026 filing committed PASV v0.1 to playoff-series predictions before the outcomes resolved. The subsequent grading recorded **two consecutive misses**. Those misses remain immutable research history.
 
 The project treats this as methodology, not embarrassment: claims are graded against the version that existed before the result was known.
 
+The pre-registration files are frozen under git tag [`prereg-pasv-v0.1`](https://github.com/GrobeStreet/pasv/tree/prereg-pasv-v0.1), which points at commit `7019298`, the first commit containing them (2026-06-08). The filing itself is dated 2026-05-26 and the grading receipts 2026-06-03; the tag proves the files have not changed since 2026-06-08, not the earlier filing date.
+
 ---
 
 ## Related NPSS correction
 
-The repository also contains the NPSS / Schemable Big subproject. Its original held-out implementation treated every non-zero continuous `hunt` value as truthy and therefore inflated the earlier **100% recall** claim. That claim is retired. The corrected v0.2 threshold and the narrower held-out Schemable Big result are preserved separately under `npss/`.
+The repository also contains the NPSS / Schemable Big subproject. Its original held-out implementation treated every non-zero continuous `hunt` value as truthy and therefore inflated the earlier **100% recall** claim. That claim is retired. With the corrected `hunt >= 0.30` rule, held-out recall is **66.7% (4 of 6)** and the held-out schemable-big decline is **−0.190 AQI**; the full table and raw output are in [`npss/results/`](npss/results/Validation_NPSS_HeldOut_2026-10-15.md).
 
 ---
 
@@ -111,7 +124,7 @@ The repository also contains the NPSS / Schemable Big subproject. Its original h
 
 The repository contains both early team-aggregate PASV work and the later per-shot validation work. When reproducing the Sloan v4 result, use the files referenced by the v4 abstract / Study 1 receipt rather than assuming the original `pasv_v01.py` team-aggregate quick start reproduces the held-out per-shot study.
 
-A remaining hardening task is to make the full per-shot Study 1 input pipeline self-contained or regenerable from frozen source manifests, with all Python/parquet dependencies pinned.
+A remaining hardening task is to make the full per-shot Study 1 input pipeline self-contained or regenerable from frozen source manifests, with all Python/parquet dependencies pinned. The regeneration path is documented in [`DATA.md`](DATA.md); the possession parquets themselves are not bundled.
 
 ---
 

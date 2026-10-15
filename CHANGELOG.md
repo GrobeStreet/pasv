@@ -15,6 +15,24 @@ Separately: a v0.2 attempt to add a DTI component to the team aggregate was a **
 
 ---
 
+## 2026-10-15
+### Fixed
+- **NPSS README:** replaced the retired 100% held-out recall with the corrected figures from `npss/code/_npss_heldout.py` (held-out recall 66.7%, 4 of 6; precision 36.4%; specificity 53.3%). Added the held-out comparison-big change (−0.108), which narrows the schemable-vs-comparison contrast out of sample.
+- **NPSS results:** committed `npss/results/Validation_NPSS_HeldOut_2026-10-15.md` and the raw script output. The README previously cited a results file that was never committed.
+- **NPSS AQI naming:** documented that this subproject's AQI is a BPM-based proxy (BPM × usage × TS%/0.550; star tier 2.0, collapse below 1.75), distinct from DataDunkNBA's net-rating AQI with its 1.73 floor.
+
+### Added
+- **Related work** in the root README: Skinner (2012), Cervone et al. (2016), Sandholtz & Bornn (2020), Duma & Benaharon (2026).
+- `DATA.md`: how to regenerate the Study 1 possession parquets.
+- Git tag `prereg-pasv-v0.1` on the first commit containing the pre-registration files.
+
+### Repository hygiene
+- `.gitignore` contained unresolved merge-conflict markers and ignored every `results/` directory, which is why the NPSS results file was never committed. Results are receipts and are now tracked; regenerated parquet inputs are ignored instead. Removed committed `__pycache__` files.
+
+### Still open
+- The Study 1 possession parquets (219,527 calibration shots; 14,377 held-out shots) are not bundled.
+- Pre-registered tests T1–T5 have not been run.
+
 ## [unreleased] — 2026-06-29
 ### Added
 - **Per-shot PASV engine** (`code/pasv_per_shot.py`) and **Study 1** (`code/run_study1.py`, `code/study1_within_player.py`, `code/study1_within_player_confirm.py`) — the first per-shot, out-of-sample validation of PASV on public event data. Calibrated on 2024-25 regular season (219,527 attempts), tested on held-out 2024-25 playoffs (14,377 attempts).
